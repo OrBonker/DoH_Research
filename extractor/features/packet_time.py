@@ -100,9 +100,9 @@ class PacketTime:
 
     def get_cov(self) -> float:
         """ Calculates coefficient of variation of packet times. """
-        co_var = -1
+        cov = -1
         avg = self.get_avg()
         std = self.get_std()
         if avg != 0:
-            co_var = std / avg
-        return co_var
+            cov = std / avg
+        return cov
