@@ -1,9 +1,13 @@
 import numpy
 from scipy import stats as stat
-from scapy.all import rdpcap
+
 
 class PacketLength:
-    """This class extracts features related to the Packet Lengths."""
+    """This class extracts features related to the Packet Lengths.
+    Attributes:
+        avg_count (int): The row number.
+        grand_total (float): The cumulative total of the means.
+    """
     
     avg_count = 0
     grand_total = 0
@@ -93,18 +97,4 @@ class PacketLength:
         else:
             return 0.0
 
-if __name__ == "__main__":
-    # Replace 'your_pcap_file.pcap' with your actual pcap file path
-    pcap_file = '/workspaces/DoH_Research/extractor/dump_00002_20200114114901.pcap'
-    packets = rdpcap(pcap_file)
 
-    # Create an instance of PacketLength with the loaded packets
-    packet_lengths = PacketLength(packets)
-
-    # Now you can use any method defined in PacketLength to analyze the packet lengths
-    print("skew_avg_median:", packet_lengths.get_skew_avg_median())
-    print("skew_avg_mode:", packet_lengths.get_skew_avg_mode())
-    print("Average packet time:", packet_lengths.get_avg())
-    print("Standard deviation of packet times:", packet_lengths.get_std())
-    print("Median of packet times:", packet_lengths.get_median())
-   

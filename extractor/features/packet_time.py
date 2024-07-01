@@ -1,7 +1,7 @@
 import numpy
 from datetime import datetime
 from scipy import stats as stat
-from scapy.all import rdpcap, PacketList
+from scapy.all import  PacketList
 
 class PacketTime:
     """This class extracts features related to the Packet Times."""
@@ -105,16 +105,3 @@ class PacketTime:
         if avg != 0:
             co_var = std / avg
         return co_var
-
-if __name__ == "__main__":
-    # Replace 'your_pcap_file.pcap' with your actual pcap file path
-    pcap_file = '/workspaces/DoH_Research/extractor/dump_00002_20200114114901.pcap'
-    packets = rdpcap(pcap_file)
-
-    # Create an instance of PacketTime with the loaded packets
-    packet_time_analysis = PacketTime(packets)
-    
-
-    # Example of using the methods in PacketTime
-    print("skew_avg_median:", packet_time_analysis.get_skew_avg_median())
-    print("skew_avg_mode:", packet_time_analysis.get_skew_avg_mode())
