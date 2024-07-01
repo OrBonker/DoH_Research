@@ -7,7 +7,7 @@ class PacketLength:
         avg_count (int): The row number.
         grand_total (float): The cumulative total of the means.
     """
-    
+
     avg_count = 0
     grand_total = 0
 
@@ -61,7 +61,7 @@ class PacketLength:
         return skew
 
     def get_skew_avg_mode(self) -> float:
-        """ Calculates skewness of packet lenghts using average and mode. """
+        """ Calculates skewness of packet lengths using average and mode. """
         avg = self.get_avg()
         mode = self.get_mode()
         dif = (avg - mode)
@@ -71,11 +71,10 @@ class PacketLength:
             skew = dif / std
         return skew
 
-    def get_co_var(self) -> float:
+    def get_cov(self) -> float:
         """ Calculates coefficient of variation of packet lengths. """
-        co_var = -1
+        cov = -1
         if self.get_avg() != 0:
-            co_var = self.get_std() / self.get_avg()
-        return co_var
-
+            cov = self.get_std() / self.get_avg()
+        return cov
 
