@@ -1,6 +1,7 @@
 import numpy
 from scipy import stats as stat
 
+
 class PacketLength:
     """This class extracts features related to the Packet Lengths.
     Attributes:
@@ -16,7 +17,12 @@ class PacketLength:
 
     def get_packet_length(self) -> list:
         """ Creates a list of packet lengths. """
-        return [len(packet) for packet, _ in self.feature.packets]
+        if isinstance(self.feature, list):
+            # Case when self.feature is a list of packets
+            return [len(packet) for packet in self.feature]
+        else:
+            # Case when self.feature is directly a packet (e.g., result of rdpcap)
+            return [len(self.feature)]
 
     def first_fifty(self) -> list:
         """ Creates a list of the sizes of the first 50 packets """
@@ -24,57 +30,71 @@ class PacketLength:
     
     def get_var(self) -> float:
         """ Calculates the variation of packet lengths in a network flow. """
-        return numpy.var(self.get_packet_length())
+        lengths = self.get_packet_length()
+        if len(lengths) > 0:
+            return numpy.var(lengths)
+        else:
+            return 0.0
     
     def get_std(self) -> float:
         """ calculates and returns the standard deviation of packet lengths. """
-        return numpy.sqrt(self.get_var())
-
+        var = self.get_var()
+        if var > 0:
+            return numpy.sqrt(var)
+        else:
+            return 0.0
 
     def get_avg(self) -> float:
         """ calculates and returns the mean of the packet lengths """
-        avg = 0
-        if self.get_packet_length() != 0:
-            avg = numpy.mean(self.get_packet_length())
-        return avg
+        lengths = self.get_packet_length()
+        if len(lengths) > 0:
+            return numpy.mean(lengths)
+        else:
+            return 0.0
 
     def get_median(self) -> float:
         """ Calculates the median of packet lengths in a network flow. """
-        return numpy.median(self.get_packet_length())
+        lengths = self.get_packet_length()
+        if len(lengths) > 0:
+            return numpy.median(lengths)
+        else:
+            return 0.0
 
     def get_mode(self) -> float:
-        """ The mode of packet lengts in a network flow. """
-        mode = -1
-        if len(self.get_packet_length()) != 0:
-            mode = int(stat.mode(self.get_packet_length())[0])
-        return mode
+        """ The mode of packet lengths in a network flow. """
+        lengths = self.get_packet_length()
+        if len(lengths) > 0:
+            return int(stat.mode(lengths)[0])
+        else:
+            return -1
     
     def get_skew_avg_median(self) -> float:
         """ Calculates skewness of packet lengths using average and median. """
         mean = self.get_avg()
         median = self.get_median()
-        dif = 3 * (mean - median)
         std = self.get_std()
-        skew = -10
-        if std != 0:
-            skew = dif / std
-        return skew
+        if std > 0:
+            return 3 * (mean - median) / std
+        else:
+            return 0.0
 
     def get_skew_avg_mode(self) -> float:
         """ Calculates skewness of packet lengths using average and mode. """
         avg = self.get_avg()
         mode = self.get_mode()
-        dif = (avg - mode)
         std = self.get_std()
-        skew = -10
-        if std != 0:
-            skew = dif / std
-        return skew
+        if std > 0:
+            return (avg - mode) / std
+        else:
+            return 0.0
 
     def get_cov(self) -> float:
         """ Calculates coefficient of variation of packet lengths. """
-        cov = -1
-        if self.get_avg() != 0:
-            cov = self.get_std() / self.get_avg()
-        return cov
+        avg = self.get_avg()
+        std = self.get_std()
+        if avg > 0:
+            return std / avg
+        else:
+            return 0.0
+
 
