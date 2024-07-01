@@ -96,12 +96,12 @@ class PacketTime:
             skew = dif / float(std)
         return skew
 
-    def get_co_var(self) -> float:
+    def get_cov(self) -> float:
         """ Calculates coefficient of variation of packet times. """
-        co_var = -1
+        cov = -1
         if self.get_avg() != 0:
-            co_var = self.get_std() / self.get_avg()
-        return co_var
+            cov = self.get_std() / self.get_avg()
+        return cov
 
 
 
