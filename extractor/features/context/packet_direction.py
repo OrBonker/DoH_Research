@@ -6,7 +6,7 @@ class PacketDirection(Enum):
     There are two possible directions that the packets can follow.
     PacketDirection is an enumeration with the values automatically assigned:
     - FORWARD : 1
-    - BACKWARD : 2
+    - REVERSE : 2
     """
     FORWARD = auto()
-    BACKWARD = auto()
+    REVERSE = auto()

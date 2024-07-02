@@ -19,7 +19,7 @@ class ResponseTime:
         temp_packet = None
         temp_direction = None
         for packet, direction in self.feature.packets:
-            if temp_direction == PacketDirection.FORWARD and direction == PacketDirection.BACKWARD:
+            if temp_direction == PacketDirection.FORWARD and direction == PacketDirection.REVERSE:
                 time_diff.append(packet.time - temp_packet.time)
             temp_packet = packet
             temp_direction = direction
