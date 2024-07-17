@@ -11,6 +11,5 @@ def create_model(segment_size):
     model.add(Dropout(0.2))
     model.add(Dense(segment_size * 2, activation='relu'))
     model.add(Dense(1, activation='sigmoid'))
-    model.compile(loss='binary_crossentropy', optimizer='adam',
-                  metrics=['accuracy'])
+    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
     return model
