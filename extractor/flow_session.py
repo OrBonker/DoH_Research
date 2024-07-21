@@ -19,7 +19,7 @@ EXPIRED_UPDATE = 40
 class FlowSession(DefaultSession):
     """Creates a list of network flows."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, prn=None, store=False, *args, **kwargs):
         self.flows = {}
         self.csv_line = 0
         if self.output_mode == 'flow':
@@ -27,7 +27,7 @@ class FlowSession(DefaultSession):
             self.csv_writer = csv.writer(output)
         self.packets_count = 0
         self.clumped_flows_per_label = defaultdict(list)
-        super(FlowSession, self).__init__(None, True, *args, **kwargs)
+        super(FlowSession, self).__init__(prn, store, *args, **kwargs)
 
 
     def toPacketList(self):
@@ -130,6 +130,7 @@ class FlowSession(DefaultSession):
         print('Garbage Collection Finished. Flows = {}'.format(len(self.flows)))
 
 
+    @staticmethod
     def generate_session_class(output_mode, output_file):
         """ Generates a new session class with specified output_mode and output_file. """
         return type('NewFlowSession', (FlowSession,), {
