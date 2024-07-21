@@ -1,16 +1,17 @@
 import numpy
 from scipy import stats as stat
-
+from scapy.plist import PacketList
+import numpy as np
 
 class PacketLength:
     """This class extracts features related to the Packet Lengths."""
 
-    def __init__(self, packets):
+    def __init__(self, packets: PacketList):
         if isinstance(packets, PacketList):
             self.packets = packets
         else:
             raise ValueError("Expected a PacketList object from Scapy.")
-    
+        
     def get_packet_length(self) -> list:
         """Creates a list of packet lengths."""
         return [len(packet) for packet in self.packets]

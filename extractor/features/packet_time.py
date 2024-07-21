@@ -2,12 +2,13 @@ import numpy
 from datetime import datetime
 from scipy import stats as stat
 from scapy.all import  PacketList
+from scapy.plist import PacketList
 
 
 class PacketTime:
     """This class extracts features related to the Packet Times."""
 
-    def __init__(self, packets):
+    def __init__(self, packets: PacketList):
         if isinstance(packets, PacketList):
             self.packets = packets
         else:
