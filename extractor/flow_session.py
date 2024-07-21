@@ -1,14 +1,18 @@
 import csv
 import os
+import sys
 from collections import defaultdict
+
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(project_root)
 
 from scapy.layers.tls.record import TLS, TLSApplicationData
 from scapy.sessions import DefaultSession
 
-from extractor.features.context.packet_direction import PacketDirection
-from extractor.features.context.packet_key import get_packet_flow_key
-from extractor.flow import Flow
-from extractor.time_series.processor import Processor
+from features.context.packet_direction import PacketDirection
+from features.context.packet_key import get_packet_flow_key
+from flow import Flow
+from time_series.processor import Processor
 
 EXPIRED_UPDATE = 40
 
@@ -132,3 +136,6 @@ class FlowSession(DefaultSession):
             'output_mode': output_mode,
             'output_file': output_file,
         })
+
+
+
