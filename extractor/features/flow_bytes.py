@@ -1,6 +1,6 @@
 from scapy.layers.inet import IP, TCP
 from scapy.layers.l2 import Ether
-
+import os
 import sys
 projectroot = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(projectroot)

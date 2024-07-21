@@ -1,8 +1,6 @@
 import os
-import zipfile
 import json
 import sys
-from scapy.all import rdpcap
 from scapy.layers.tls.record import TLSApplicationData
 from scapy.layers.inet import IP, TCP
 
