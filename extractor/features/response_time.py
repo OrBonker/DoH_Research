@@ -1,64 +1,57 @@
-import numpy
+import numpy as np
 from scipy import stats as stat
+import os
+import sys
 
-from extractor.features.context.packet_direction import PacketDirection
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(project_root)
+
+from features.context.packet_direction import PacketDirection
 
 class ResponseTime:
     """ A summary of features based on the time difference
         between an outgoing packet and the following response. """
 
-    def __init__(self, feature):
-        self.feature = feature
+    def __init__(self, packets):
+        self.packets = packets
+        self.timestamps = [packet.time for packet in packets]
+
 
     def get_dif(self) -> list:
         """Calculates the time difference in seconds between an outgoing packet 
            and the following response packet.
-           return a list of time differences. """
+           Returns a list of time differences. """
         time_diff = []
         temp_packet = None
-        temp_direction = None
-        for packet, direction in self.feature:
-            if temp_direction == PacketDirection.FORWARD and direction == PacketDirection.REVERSE:
-                time_diff.append(float(packet.time - temp_packet.time))  # כאן הוספתי המרה ל-float
+        for packet in self.packets:
+            if temp_packet and temp_packet.direction == PacketDirection.FORWARD and packet.direction == PacketDirection.REVERSE:
+                time_diff.append(float(packet.time - temp_packet.time))
             temp_packet = packet
-            temp_direction = direction
         return time_diff
 
     def get_var(self) -> float:
-        """ calculates the variance of the time differences. """
-        var = -1
+        """ Calculates the variance of the time differences. """
         diffs = self.get_dif()
-        if len(diffs) != 0:
-            var = np.var(diffs)
-        return var
+        return np.var(diffs) if diffs else 0.0
 
     def get_avg(self) -> float:
-        """ calculates the mean of the time differences. """
-        avg = -1
+        """ Calculates the mean of the time differences. """
         diffs = self.get_dif()
-        if len(diffs) != 0:
-            avg = np.mean(diffs)
-        return avg
+        return np.mean(diffs) if diffs else 0.0
 
     def get_median(self) -> float:
-        """ calculates the median of the time differences. """
-        return np.median(self.get_dif())
+        """ Calculates the median of the time differences. """
+        diffs = self.get_dif()
+        return np.median(diffs) if diffs else 0.0
     
     def get_mode(self) -> float:
-        """ calculates the mode of the time differences. """
-        mode = -1
+        """ Calculates the mode of the time differences. """
         diffs = self.get_dif()
-        if len(diffs) != 0:
-            mode = float(stat.mode(diffs)[0])
-        return mode
+        return float(stat.mode(diffs).mode[0]) if diffs else 0.0
 
     def get_std(self) -> float:
         """ Calculates the standard deviation of the list of time differences. """
-        std = -1
-        diffs = self.get_dif()
-        if len(diffs) != 0:
-            std = np.sqrt(self.get_var())
-        return std
+        return np.sqrt(self.get_var())
 
     def get_skew_avg_median(self) -> float:
         """ Calculates skewness of the time differences using average and median. """
@@ -66,26 +59,17 @@ class ResponseTime:
         median = self.get_median()
         dif = 3 * (avg - median)
         std = self.get_std()
-        skew = -10
-        if std != 0:
-            skew = dif / std
-        return skew
+        return dif / std if std != 0 else 0.0
 
     def get_skew_avg_mode(self) -> float:
         """ Calculates skewness of the time differences using average and mode. """
         avg = self.get_avg()
         mode = self.get_mode()
-        dif = (float(avg) - mode)
+        dif = avg - mode
         std = self.get_std()
-        skew2 = -10
-        if std != 0:
-            skew2 = dif / float(std)
-        return skew2
+        return dif / std if std != 0 else 0.0
 
     def get_cov(self) -> float:
-        """ calculates the coefficient of variance (COV) of the time differences """
-        cov = -1
+        """ Calculates the coefficient of variance (COV) of the time differences. """
         avg = self.get_avg()
-        if avg != 0:
-            cov = self.get_std() / avg
-        return cov 
+        return self.get_std() / avg if avg != 0 else 0.0
