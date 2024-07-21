@@ -1,10 +1,15 @@
-import json
 import os
+import json
+import sys
 from scapy.layers.tls.record import TLSApplicationData
+from scapy.layers.inet import IP, TCP
 
-from extractor import constants
-from extractor.features.context.packet_direction import PacketDirection
+# Add project root to sys.path
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(project_root)
 
+from features.context.packet_direction import PacketDirection
+from constants import CLUMP_TIMEOUT
 
 class Clump:
     """ The Clump class represents a group of packets traveling in the same direction, 
@@ -23,14 +28,15 @@ class Clump:
         if self.first_timestamp == 0:
             self.first_timestamp = packet.time
         self.packets += 1
-        self.size += len(packet[TLSApplicationData])
+        if TLSApplicationData in packet:
+            self.size += len(packet[TLSApplicationData])
         self.latest_timestamp = packet.time
 
     def accepts(self, packet, direction):
         """ Determines whether a packet can be added to the current clump """
         if direction != self.direction:
             return False
-        if self.latest_timestamp != 0 and packet.time - self.latest_timestamp > constants.CLUMP_TIMEOUT:
+        if self.latest_timestamp != 0 and packet.time - self.latest_timestamp > CLUMP_TIMEOUT:
             return False
         return True
     
@@ -68,19 +74,24 @@ class FlowClumpsContainer:
 
     def to_json_file(self, directory):
         """ Saves the clump data to a JSON file. """
-        preferred_name = '{}_{}-{}_{}.json'.format(self.flow.src_ip, self.flow.src_port,
-                                                   self.flow.dest_ip, self.flow.dest_port)
+        preferred_name = '{}_{}-{}_{}.json'.format(self.flow['src'], self.flow['sport'],
+                                                   self.flow['dst'], self.flow['dport'])
         file_path = os.path.join(directory, preferred_name)
+        print(f"Saving JSON to: {file_path}")
         output, count = self.output()
-        if count < 5:
-            return
+        # Temporarily removing the clump count check for debugging
+        # if count < 5:
+        #     print("Clump count is less than 5, not saving the file.")
+        #     return
         if os.path.exists(file_path):
-            f = open(file_path, 'r')
-            contents = json.load(f)
-            contents.append(output)
-            f.close()
+            with open(file_path, 'r') as f:
+                contents = json.load(f)
+                contents.append(output)
         else:
             contents = [output]
-        f = open(file_path, 'w')
-        json.dump(contents, f, indent=2)
-        f.close()
+        with open(file_path, 'w') as f:
+            json.dump(contents, f, indent=2)
+        print(f"File saved: {file_path}")
+
+
+
