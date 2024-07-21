@@ -2,6 +2,10 @@ import argparse
 
 from scapy.all import load_layer
 from scapy.sendrecv import AsyncSniffer
+import os
+import sys
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(project_root)
 
 from extractor.flow_session import FlowSession 
 
