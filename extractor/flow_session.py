@@ -38,6 +38,7 @@ class FlowSession(DefaultSession):
 
     def on_packet_received(self, packet):
         """ Handles packets as they are received. """
+
         count = 0
         direction = PacketDirection.FORWARD
 
@@ -130,13 +131,12 @@ class FlowSession(DefaultSession):
         print('Garbage Collection Finished. Flows = {}'.format(len(self.flows)))
 
 
-    @staticmethod
     def generate_session_class(output_mode, output_file):
         """ Generates a new session class with specified output_mode and output_file. """
         return type('NewFlowSession', (FlowSession,), {
             'output_mode': output_mode,
             'output_file': output_file,
         })
+    
 
-
-
+    
