@@ -35,13 +35,16 @@ class Flow:
         self.latest_timestamp = 0
         self.start_timestamp = 0
 
-    def add_packet(self, packet: Packet, direction: Enum) -> None:
+    def add_packet(self, packet, direction) -> None:
         """Adds a packet to the current list of packets."""
         self.packets.append(packet)
         self.directions.append(direction)  # Store direction
         self.latest_timestamp = max([packet.time, self.latest_timestamp])
         if self.start_timestamp == 0:
             self.start_timestamp = packet.time
+        #print(f"Adding packet with direction: {direction} and time: {packet.time}")
+
+
 
     def get_data(self) -> dict:
         """Obtains the values of the features extracted from each flow."""
@@ -49,7 +52,7 @@ class Flow:
         flow_bytes = FlowBytes(self.packets, self.directions)  # Pass both PacketList and directions
         packet_length = PacketLength(self.packets)  # Pass PacketList
         packet_time = PacketTime(self.packets)  # Pass PacketList
-        response = ResponseTime(self.packets)  # Pass PacketList
+        response = ResponseTime(self.packets, self.directions)  # Pass PacketList and directions
         data = {
             'SourceIP': self.src_ip,
             'DestinationIP': self.dest_ip,

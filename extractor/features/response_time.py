@@ -1,33 +1,36 @@
 import numpy as np
 from scipy import stats as stat
-import os
-import sys
-
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(project_root)
-
-from features.context.packet_direction import PacketDirection
+from collections import deque
+from context.packet_direction import PacketDirection
 
 class ResponseTime:
     """ A summary of features based on the time difference
         between an outgoing packet and the following response. """
 
-    def __init__(self, packets):
+    def __init__(self, packets, directions):
         self.packets = packets
+        self.directions = directions
         self.timestamps = [packet.time for packet in packets]
 
+        # Debugging output to check the packets and directions
+       # for i, packet in enumerate(self.packets):
+        #    print(f"Packet: {packet.summary()}, Direction: {self.directions[i]}")
 
     def get_dif(self) -> list:
-        """Calculates the time difference in seconds between an outgoing packet 
-           and the following response packet.
-           Returns a list of time differences. """
-        time_diff = []
-        temp_packet = None
-        for packet in self.packets:
-            if temp_packet and temp_packet.direction == PacketDirection.FORWARD and packet.direction == PacketDirection.REVERSE:
-                time_diff.append(float(packet.time - temp_packet.time))
-            temp_packet = packet
-        return time_diff
+        """Calculate time differences between FORWARD and REVERSE packets."""
+        forward_times = []
+        time_diffs = []
+
+        for packet, direction in zip(self.packets, self.directions):
+            if direction.value == PacketDirection.FORWARD.value:
+                forward_times.append(packet.time)
+            elif direction.value == PacketDirection.REVERSE.value and forward_times:
+                # Pair the first forward packet with the first reverse packet
+                forward_time = forward_times.pop(0)
+                time_diff = packet.time - forward_time
+                time_diffs.append(float(time_diff))
+
+        return time_diffs
 
     def get_var(self) -> float:
         """ Calculates the variance of the time differences. """
