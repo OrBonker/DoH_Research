@@ -70,12 +70,21 @@ class PacketTime:
         return numpy.median(packet_times)
     
     def get_mode(self) -> float:
-        """ The mode of packet times in the network flow. """
+        """Calculates the mode of packet times in the network flow."""
         packet_times = numpy.array(self.get_packet_times(), dtype=numpy.float64)
-        mode = -1
-        if len(packet_times) != 0:
-            mode = float(stat.mode(packet_times)[0])
-        return mode
+        rounded_times = numpy.round(packet_times, decimals=3)  # Adjust the number of decimals as needed
+
+        if len(rounded_times) == 0:
+            return 0.0  # Return 0 if the array is empty
+
+        mode_result = stat.mode(rounded_times)
+
+        if mode_result.count[0] > 1:  # Check if the mode occurs more than once
+            return float(mode_result.mode[0])
+        else:
+            # If there's no real mode, fallback to another measure like the mean or median
+            return numpy.mean(rounded_times)  # or numpy.median(rounded_times), or 0.0
+
 
     def get_skew_avg_median(self) -> float:
         """ Calculates skewness of packet times using average and median. """
