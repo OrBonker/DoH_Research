@@ -4,15 +4,31 @@ This repository contains the tools and data developed for our final project, foc
 
 ## Installation
 
-_(Provide installation instructions here)_
+To install the necessary dependencies, run the following command:
+
+bash
+pip install -r requirements.txt
+
 
 ## Usage
 
-_(Provide usage details here)_
+-**Running the Extractor**
+To run the extractor module on a directory containing communication files (e.g., PCAP files), use the following command:
+bash
+Copy code
+python dohlyzer.py -f "path/to/communication/files" -c "output_csv_file.csv"
+This will process the input PCAP files and save the extracted data to the specified CSV file.
 
+-**Running the Visualizer**
+To run the visualizer and visualize the clumps from the extracted data, use the following command:
+bash
+python main.py
+
+-**Analyzer Usage**
+In the analyzer folder, a Jupyter notebook (.ipynb) file is provided, which demonstrates how to load and use the trained models for DoH traffic classification. You can use it to apply the models to the extracted traffic features.
 ## Dependencies
 
-_(List dependencies here)_
+Refer to requirements.txt for the full list of required Python packages.
 
 ## Extractor Module
 
@@ -42,10 +58,3 @@ We created an adapted dataset consisting of network traffic of 3 types:
 
 For the purpose of capturing the traffic, we used **Wireshark**. The captured files were organized in a structured manner, constituting our dataset. This dataset can be used to analyze the behavior of different types of traffic, especially to identify and distinguish DoH traffic from other forms of HTTPS traffic.
 
-## Contributing
-
-_(Provide contribution guidelines here)_
-
-## License
-
-_(Specify the license here)_
