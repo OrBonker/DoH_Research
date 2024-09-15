@@ -13,7 +13,13 @@ class Processor:
     def clumps(self):
         """ Generator that processes packets in the flow and groups them into clumps. """
         current_clump = None
-        for packet, direction in self.flow.packets:
+        for item in self.flow.packets:
+            if isinstance(item, tuple) and len(item) == 2:
+                packet, direction = item
+            else:
+                packet = item
+                direction = None 
+
             if TLS not in packet:
                 continue
             if TLSApplicationData not in packet:

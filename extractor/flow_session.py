@@ -44,8 +44,10 @@ class FlowSession(DefaultSession):
         self.garbage_collect(None)
         return super(FlowSession, self).toPacketList()
 
+
+
     def on_packet_received(self, packet):
-        """ Handles packets as they are received. """
+        """Handles packets as they are received."""
         
         # Drop packets not connected to the specified server IPs
         if IP not in packet or (packet[IP].src not in server_ips and packet[IP].dst not in server_ips):
@@ -56,6 +58,10 @@ class FlowSession(DefaultSession):
         
         # Proceed with processing if direction is determined
         if direction is None:
+            return
+
+        # Skip non-TCP packets
+        if not packet.haslayer('TCP'):
             return
 
         if self.output_mode != 'flow':
@@ -104,31 +110,65 @@ class FlowSession(DefaultSession):
             print('Packet count: {}'.format(self.packets_count))
             self.garbage_collect(packet.time)
 
+
     def get_flows(self) -> list:
         """ Returns the list of current flows. """
         return self.flows.values()
+
+    import csv
 
     def garbage_collect(self, latest_time) -> None:
         """ Cleans up old or expired flows. """
         
         print('Garbage Collection Began. Flows = {}'.format(len(self.flows)))
         keys = list(self.flows.keys())
+
         for k in keys:
             flow = self.flows.get(k)
+
             if self.output_mode == 'flow':
                 if latest_time is None or latest_time - flow.latest_timestamp > EXPIRED_UPDATE or flow.duration > 90:
+                    print(f"Saving flow data for flow: {flow}")
                     data = flow.get_data()
                     self.csv_writer.writerow(data.values())
                     self.csv_line += 1
                     del self.flows[k]
             else:
-                if latest_time is None or latest_time - flow.latest_timestamp > EXPIRED_UPDATE:
-                    output_dir = os.path.join(self.output_file, 'doh' if flow.is_doh() else 'ndoh')
-                    os.makedirs(output_dir, exist_ok=True)
+                print(f"Processing clumps for flow: {flow}")
+
+                output_dir = 'C:/Users/or26bo/Desktop/DoH_Research/visualizer'
+                os.makedirs(output_dir, exist_ok=True)
+
+                # Open a CSV file for writing clump data
+                clump_csv_file = os.path.join(output_dir, 'clumps_output.csv')
+
+                with open(clump_csv_file, mode='a', newline='') as csvfile:
+                    csv_writer = csv.writer(csvfile)
+
+                    # Process the flow and get the clumps
                     proc = Processor(flow)
                     flow_clumps = proc.create_flow_clumps_container()
-                    flow_clumps.to_json_file(output_dir)
-                    del self.flows[k]
+
+                    # Check if clumps are created
+                    clumps = list(flow_clumps.clumps)
+
+                    if len(clumps) == 0:
+                        continue
+
+                    # Write headers if necessary (only for the first time)
+                    csv_writer.writerow(['Clump Interarrival', 'Clump Duration', 'Clump Size', 'Clump Packets', 'Clump Direction'])
+
+                    # Write clump data to the CSV file
+                    for clump in clumps:
+                        csv_writer.writerow([
+                            float(clump.first_timestamp - clump.latest_timestamp),  # Interarrival time
+                            float(clump.duration()),  # Duration
+                            clump.size,  # Clump size
+                            clump.packets,  # Number of packets
+                            1 if clump.direction == PacketDirection.FORWARD else -1  # Clump direction
+                        ])
+                del self.flows[k]
+
         print('Garbage Collection Finished. Flows = {}'.format(len(self.flows)))
 
     @staticmethod

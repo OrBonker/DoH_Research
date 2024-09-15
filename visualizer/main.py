@@ -1,11 +1,10 @@
+import os
+import csv
 import argparse
-import json
 import math
-
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
-
 
 class TimeScale:
     def __init__(self):
@@ -14,7 +13,6 @@ class TimeScale:
     def move_forward(self, passed):
         passed = max(passed, 1e-4)
         transformed_passed = math.log(passed * 1e5)
-        # print(passed, transformed_passed)
         self.time += transformed_passed
         return transformed_passed
 
@@ -54,10 +52,9 @@ class ClumpSequence:
             align='edge',
             color=self.colors
         )
-        # print(self.widths)
 
         self.axes.set_yscale('log')
-        self.axes.set_ylim(bottom=50, top=1e4)
+        self.axes.set_ylim(bottom=50, top=1e3)
         self.axes.set_xlim(left=0, right=500)
         self.axes.set_title(self.title)
 
@@ -71,12 +68,25 @@ def visualize(title, clumps_seq):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('input')
+    parser.add_argument('input', nargs='?', default='clumps_output.csv')  # Default to clumps_output.csv
     args = parser.parse_args()
 
-    f = open(args.input)
-    contents = json.load(f)
+    # Find the path of the file
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    csv_file_path = os.path.join(script_dir, args.input)
 
-    visualize(args.input, contents[0])
+    # Read the CSV file
+    clumps = []
+    with open(csv_file_path, 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        header = next(reader)  # Skip the header row
 
+        for row in reader:
+            try:
+                clump = [float(row[0]), float(row[1]), int(row[2]), int(row[3]), int(row[4])]
+                clumps.append(clump)
+            except ValueError:
+                continue
 
+    # Visualize the data
+    visualize(args.input, clumps)
