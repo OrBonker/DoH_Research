@@ -6,22 +6,22 @@ This repository contains the tools and data developed for our final project, foc
 
 To install the necessary dependencies, run the following command:
 
-bash
+```bash
 pip install -r requirements.txt
-
 
 ## Usage
 
 -**Running the Extractor**
 To run the extractor module on a directory containing communication files (e.g., PCAP files), use the following command:
-bash
-Copy code
+
+```bash
 python dohlyzer.py -f "path/to/communication/files" -c "output_csv_file.csv"
 This will process the input PCAP files and save the extracted data to the specified CSV file.
 
 -**Running the Visualizer**
 To run the visualizer and visualize the clumps from the extracted data, use the following command:
-bash
+
+```bash
 python main.py
 
 -**Analyzer Usage**
