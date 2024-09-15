@@ -70,6 +70,7 @@ class FlowClumpsContainer:
                 1 if c.direction == PacketDirection.FORWARD else -1
             ])
             latest_clump_end_timestamp = c.latest_timestamp
+            
         return results, count
 
     def to_json_file(self, directory):

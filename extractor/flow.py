@@ -37,7 +37,7 @@ class Flow:
 
     def add_packet(self, packet, direction) -> None:
         """Adds a packet to the current list of packets."""
-        self.packets.append(packet)
+        self.packets.append((packet, direction))
         self.directions.append(direction)  # Store direction
         self.latest_timestamp = max([packet.time, self.latest_timestamp])
         if self.start_timestamp == 0:
@@ -46,13 +46,24 @@ class Flow:
 
 
 
+    from scapy.plist import PacketList
+
     def get_data(self) -> dict:
         """Obtains the values of the features extracted from each flow."""
         print(f"Number of packets: {len(self.packets)}, Number of directions: {len(self.directions)}")
-        flow_bytes = FlowBytes(self.packets, self.directions)  # Pass both PacketList and directions
-        packet_length = PacketLength(self.packets)  # Pass PacketList
-        packet_time = PacketTime(self.packets)  # Pass PacketList
-        response = ResponseTime(self.packets, self.directions)  # Pass PacketList and directions
+
+        # Extract only the packets from the (packet, direction) tuples
+        packets_only = [packet for packet, direction in self.packets]
+
+        # Convert the packets_only list to a Scapy PacketList
+        packet_list = PacketList(packets_only)
+
+        # Pass the PacketList to FlowBytes and other classes
+        flow_bytes = FlowBytes(packet_list, self.directions)  # Pass PacketList and directions
+        packet_length = PacketLength(packet_list)  # Pass PacketList
+        packet_time = PacketTime(packet_list)  # Pass PacketList
+        response = ResponseTime(packet_list, self.directions)  # Pass PacketList and directions
+
         data = {
             'SourceIP': self.src_ip,
             'DestinationIP': self.dest_ip,
@@ -91,6 +102,7 @@ class Flow:
             'DoH': self.is_doh(),
         }
         return data
+
 
     def is_doh(self) -> bool:
         """Checks if the source or destination IP of the flow is in the list of DoH IPs."""
