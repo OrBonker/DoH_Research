@@ -8,6 +8,7 @@ To install the necessary dependencies, run the following command:
 
 ```bash
 pip install -r requirements.txt
+```
 
 ## Usage
 
@@ -16,6 +17,7 @@ To run the extractor module on a directory containing communication files (e.g.,
 
 ```bash
 python dohlyzer.py -f "path/to/communication/files" -c "output_csv_file.csv"
+```
 This will process the input PCAP files and save the extracted data to the specified CSV file.
 
 -**Running the Visualizer**
@@ -23,6 +25,7 @@ To run the visualizer and visualize the clumps from the extracted data, use the 
 
 ```bash
 python main.py
+```
 
 -**Analyzer Usage**
 In the analyzer folder, a Jupyter notebook (.ipynb) file is provided, which demonstrates how to load and use the trained models for DoH traffic classification. You can use it to apply the models to the extracted traffic features.
